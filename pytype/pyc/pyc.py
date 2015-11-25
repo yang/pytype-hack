@@ -34,7 +34,8 @@ def compile_src_string_to_pyc_string(src, python_version):
     # In order to be able to compile pyc files for both Python 2 and Python 3,
     # we spawn an external process.
     exe = "python" + ".".join(map(str, python_version))
-    subprocess.check_call([exe, "-mpy_compile", fi.name])
+    pyc_name = subprocess.check_output([exe, "-c","import py_compile,sys; sys.stdout.write(str(py_compile.compile(sys.argv[1])))", fi.name]).strip()
+    if python_version < (3, 0): pyc_name = basename + ".pyc"
     with open(pyc_name, "rb") as output:
       return output.read()
   finally:

@@ -387,6 +387,7 @@ def process_one_file(input_filename, output_filename, options, imports_map,
 def main(argv):
   options, input_filenames = _parse_options(argv)
   unused_executable = input_filenames.pop(0)
+  #input_filenames = open(input_filenames[0]).read().strip().split('\n')
 
   _initialize_logging(options)
 
@@ -435,16 +436,20 @@ def main(argv):
   if len(src_out) > 1:
     src_out.sort(reverse=True, key=lambda s: os.path.getsize(s[0]))
     for input_filename, output_filename in src_out[1:]:
-      log.info("Process [pre-pass] %s => %s", input_filename, output_filename)
-      _ = process_one_file(input_filename, output_filename, options,
-                           imports_map, pythonpath, import_drop_prefixes,
-                           python_version)
+      log.error("Process [pre-pass] %s => %s", input_filename, output_filename)
+      try:
+          _ = process_one_file(input_filename, output_filename, options,
+                               imports_map, pythonpath, import_drop_prefixes,
+                               python_version)
+      except: log.exception('failure!')
 
   for input_filename, output_filename in src_out:
-    log.info("Process %s => %s", input_filename, output_filename)
-    ret = process_one_file(input_filename, output_filename, options,
-                           imports_map, pythonpath, import_drop_prefixes,
-                           python_version)
+    log.error("Process %s => %s", input_filename, output_filename)
+    try:
+        ret = process_one_file(input_filename, output_filename, options,
+                               imports_map, pythonpath, import_drop_prefixes,
+                               python_version)
+    except: log.exception('failure!')
     if ret and not options.nofail:
       return ret
 
